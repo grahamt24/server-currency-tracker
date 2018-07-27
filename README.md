@@ -3,7 +3,7 @@ Tracks and records spending of gold during a session, shows amount spent, earned
 
  
 
-#USAGE:
+# USAGE:
 Type "/sct" or mouse over the minimap icon (gold stack) to display the information about your current gold on the server.
 
  
