@@ -50,7 +50,7 @@ end
 function SCT:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("SCTDB", defaults)
     self.db:RegisterDefaults(defaults)
-    icon:Register("ServerCurrecyTracker", sctLDB, self.db.profile.minimap)
+    icon:Register("ServerCurrencyTracker", sctLDB, self.db.profile.minimap)
     SCT:Initialize()
     SCT:RegisterChatCommand("sct", "SlashProcessing")
 end
@@ -87,12 +87,12 @@ function SCT:SEND_MAIL_MONEY_CHANGED()
     SCT:UpdateGold()
 end
 
--- handle PLAYER_LOGOUT evemt
+-- handle PLAYER_LOGOUT event
 function SCT:PLAYER_LOGOUT()
     -- store and update necessary values
     self.db.realm[nameAndClass] = currentGold
-    self.db.realm.gold = self.db.realm.gold - spentGold
-    self.db.realm.gold = self.db.realm.gold + earnedGold
+    self.db.realm.gold = self.db.realm.gold + totalSpentGold
+    self.db.realm.gold = self.db.realm.gold + totalEarnedGold
 end
 
 -- initialize the realm gold to be 0 if it's nil
@@ -109,33 +109,37 @@ function SCT:GetInfo()
         self.db.realm[nameAndClass] = currentGold
         self.db.realm.gold = self.db.realm.gold + currentGold
     end
-    spentGold = 0
-    earnedGold = 0
+    totalSpentGold = 0
+    totalEarnedGold = 0
 end
 
 -- Update the gold for the character
 function SCT:UpdateGold()
     local transactionGold = GetMoney()
-    goldDiff = currentGold - transactionGold
-    if goldDiff > 0 then
-        spentGold = spentGold + goldDiff
+    local spentGold = 0
+    local earnedGold = 0
+    goldDiff = transactionGold - currentGold
+    if goldDiff < 0 then
+        spentGold = goldDiff
+        totalSpentGold = totalSpentGold + goldDiff
     else
-        earnedGold = earnedGold + goldDiff
+        earnedGold = goldDiff
+        totalEarnedGold = totalEarnedGold + goldDiff
     end
     currentGold = transactionGold
     self.db.realm[nameAndClass] = currentGold
-    self.db.realm.gold = self.db.realm.gold - spentGold
+    self.db.realm.gold = self.db.realm.gold + spentGold
     self.db.realm.gold = self.db.realm.gold + earnedGold
 end
 
 -- Display the gold upon /sct
 function SCT:DisplayGold()
-    SCT:Print("You have earned " .. SCT:FormatGold(earnedGold))
-    SCT:Print("You have spent " .. SCT:FormatGold(spentGold))
-    local change = spentGold + earnedGold
-    if change > 0 then
+    SCT:Print("You have earned " .. SCT:FormatGold(totalEarnedGold))
+    SCT:Print("You have spent " .. SCT:FormatGold(totalSpentGold))
+    local change = totalSpentGold + totalEarnedGold
+    if change < 0 then
         SCT:Print("Session Loss: " .. SCT:FormatGold(change))
-    elseif change < 0 then
+    elseif change > 0 then
         SCT:Print("Session Gain: " .. SCT:FormatGold(change))
     end
     SCT:Print("Total Gold on " .. realmName .. ": " .. SCT:FormatGold(self.db.realm.gold))
@@ -190,18 +194,18 @@ function SCT:ShowTooltip()
     
     line = tooltip:AddLine()
     tooltip:SetCell(line,1,"Earned:")
-    tooltip:SetCell(line,7,SCT:FormatGold(earnedGold),nil, "RIGHT")
+    tooltip:SetCell(line,7,SCT:FormatGold(totalEarnedGold),nil, "RIGHT")
     
     line = tooltip:AddLine()
     tooltip:SetCell(line,1,"Spent:",nil)
-    tooltip:SetCell(line,7,SCT:FormatGold(spentGold),nil, "RIGHT")
+    tooltip:SetCell(line,7,SCT:FormatGold(totalSpentGold),nil, "RIGHT")
     
     line = tooltip:AddLine()
-    local change = spentGold + earnedGold
-    if change > 0 then
+    local change = totalSpentGold + totalEarnedGold
+    if change < 0 then
         tooltip:SetCell(line,1,"Session Loss:")
         tooltip:SetCell(line,7,SCT:FormatGold(change))
-    elseif change < 0 then
+    elseif change > 0 then
         tooltip:SetCell(line,1,"Session Gain:")
         tooltip:SetCell(line,7,SCT:FormatGold(change))
     end

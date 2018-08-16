@@ -1,0 +1,8 @@
+------------------------------------------------------------------------
+r77 | funkydude | 2018-08-11 20:44:29 +0000 (Sat, 11 Aug 2018) | 1 line
+Changed paths:
+   M /trunk/LibDBIcon-1.0/LibDBIcon-1.0.lua
+
+Add :SetButtonToPosition(name/button, position)
+------------------------------------------------------------------------
+
