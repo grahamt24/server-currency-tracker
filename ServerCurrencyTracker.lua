@@ -4,8 +4,8 @@ local icon = LibStub("LibDBIcon-1.0")
 local LibQTip = LibStub("LibQTip-1.0")
 local sctLDB = LibStub("LibDataBroker-1.1"):NewDataObject("SCT", {
     type = "data source",
-    label = "ServerCurrecyTracker",
-    tocname = "ServerCurrecyTracker",
+    label = "ServerCurrencyTracker",
+    tocname = "ServerCurrencyTracker",
     icon = "Interface\\Icons\\INV_Misc_Coin_02",
 })
 local defaults = {
